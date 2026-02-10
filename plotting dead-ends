@@ -1,23 +1,11 @@
+
 G_u = graph.to_undirected()
-
 nodes_gdf = ox.graph_to_gdfs(G_u, edges=False)
-degrees = dict(G_u.degree())
+degrees = dict(G_u.degree()) # filters
 
-dead_nodes = nodes_gdf.loc[
-    [(n in degrees and degrees[n] == 1) for n in nodes_gdf.index]
-] # filter dead-ends
+dead_nodes = nodes_gdf[
+    (nodes_gdf.index.map(lambda n: degrees.get(n, 0) == 1)) &
+    (nodes_gdf.geometry.distance(center) <= radius)
+] # ensures only dead-ends within raidus are plotted
 
-dead_nodes = dead_nodes[dead_nodes.geometry.distance(center) <= radius] # keeps dead ends within radius 
-
-for node in dead_nodes.index:
-    neighbors = list(G_u.neighbors(node))
-    neighbor = neighbors[0]  # only one neighbor for dead end
-    edge_data = list(G.get_edge_data(node, neighbor).values())[0]
-
-    if "geometry" in edge_data:
-        x, y = edge_data["geometry"].xy
-    else:
-        x = [G.nodes[node]["x"], G.nodes[neighbor]["x"]]
-        y = [G.nodes[node]["y"], G.nodes[neighbor]["y"]]
-
-    ax.plot(x, y, color="red", linewidth=1.5, zorder=6) # keep the settings the same. 
+ax.plot(x, y, color="red", linewidth=1.5, zorder=6) # keep the settings the same. 
