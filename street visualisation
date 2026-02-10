@@ -1,0 +1,16 @@
+graph = ox.graph_from_address(loc, dist=dist, network_type="drive")
+graph = ox.project_graph(graph) 
+
+center_lat, center_lon = ox.geocode(loc)
+
+center_point = gpd.GeoSeries(
+    [Point(center_lon, center_lat)],
+    crs="EPSG:4326"
+).to_crs(graph.graph["crs"]).iloc[0] # should be centre of church 
+
+fig, ax = ox.plot.plot_figure_ground(
+    graph,
+    color="white",
+    show=False,
+    close=False # plots street network visaulisation 
+)
