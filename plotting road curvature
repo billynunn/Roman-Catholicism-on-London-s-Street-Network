@@ -1,0 +1,28 @@
+
+edges = ox.graph_to_gdfs(graph, nodes=False)
+
+edges["euclidean_dist"] = edges.geometry.apply(
+    lambda g: Point(g.coords[0]).distance(Point(g.coords[-1]))
+)
+edges["circuity"] = edges["length"] / edges["euclidean_dist"]
+edges = edges.replace([np.inf], np.nan).dropna(subset=["circuity"])
+
+edges["midpoint"] = edges.geometry.apply(
+    lambda g: g.interpolate(0.5, normalized=True)
+)
+edges["dist_to_center"] = edges["midpoint"].distance(center_point) # calcualtes road circuity for the whole map 
+
+def is_high_circuity(row):
+    hw = row.get("highway")
+    if isinstance(hw, list):
+        hw = hw[0]
+    return hw in curv and row["circuity"] > curv[hw]
+
+high_circ_edges = edges[
+    (edges["dist_to_center"] <= radius) &
+    (edges.apply(is_high_circuity, axis=1)) # if road circuity is above the threshold provided earlier, and is in within the radius provided, it will be plotted.
+]
+
+for geom in high_circ_edges.geometry:
+    x, y = geom.xy
+    ax.plot(x, y, color="orange", linewidth=1.6, zorder=5) # linewidth and zorder can be adjusted. increasing does look a bit weird on the graph 
