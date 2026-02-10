@@ -1,0 +1,11 @@
+ax.scatter(
+    c="gold", # church 
+    edgecolors="black",
+    s=140,
+    zorder=10,
+    label=loc
+)
+
+ax.legend(loc="upper right")
+fig.savefig("stpauls.png", dpi=300, bbox_inches="tight")
+plt.show()
