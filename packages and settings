@@ -1,0 +1,15 @@
+import osmnx as ox
+import numpy as np
+import matplotlib.pyplot as plt
+import geopandas as gpd
+from shapely.geometry import Point
+
+dist = 1000  # m (do not change)
+radius = 300  # m (do not change)
+loc = "St Paul's Cathedral, London" # changed for location 
+
+curv = {
+    "residential": 2.0,  # thresholds (do not change)
+    "primary": 2.0,
+    "motorway": 2.0,
+}
